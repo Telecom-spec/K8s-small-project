@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: mydep2
+    labels:
+      type: replicaset
+spec:
+    replicas: 2
+    selector:
+      matchLabels:
+        app: supermario
+    template:
+      metadata:
+        labels:
+          app: supermario
+      spec:
+        containers:
+        - name: my-container-nginx
+          image: docker.io/pengbai/docker-supermario
+
+# Service - ClusterIP
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    type: replicaset
+  name: mydep3
+spec:
+  ports:
+  - port: 80 # This can be random port number
+    protocol: TCP
+    targetPort: 8080 # This is always image/container port
+  selector:
+    app: supermario
+status:
+  loadBalancer: {}
+
+# Service - Nodeport
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    type: replicaset
+  name: mydep4
+spec:
+  ports:
+  - port: 80  # This can be random port number
+    protocol: TCP
+    targetPort: 8080  # This is always image/container port
+  selector:
+    app: supermario
+  type: nodeport
+status:
+  loadBalancer: {}
+
