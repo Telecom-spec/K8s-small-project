@@ -1,0 +1,12 @@
+FROM maven:3.9.4-eclipse-temurin-8-focal
+RUN mkdir /app
+ENV SERVICE_NAME="tomcat"
+RUN groupadd --gid 1001 $SERVICE_NAME \
+    && useradd -g $SERVICE_NAME -s /bin/bash -m --uid 1001 $SERVICE_NAME
+WORKDIR /app
+COPY . .
+RUN chown -R $SERVICE_NAME:$SERVICE_NAME /app && chmod -R 775 /app
+USER $SERVICE_NAME
+RUN mvn clean package
+FROM telecomspec/tomcat:8.5
+COPY --from=0 /app/target/maven-web-application*.war /usr/local/tomcat/webapps/maven-web-application.war
